@@ -1,0 +1,26 @@
+{
+  "name": "ini-builder",
+  "version": "1.0.1",
+  "description": "Node.js module for reading and writing INI and *NIX config files",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "nodeunit test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bryan-m-hughes/ini-builder.git"
+  },
+  "keywords": [
+    "ini",
+    "config files"
+  ],
+  "author": "Bryan Hughes <bryan@theoreticalideations.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bryan-m-hughes/ini-builder/issues"
+  },
+  "homepage": "https://github.com/bryan-m-hughes/ini-builder"
+}

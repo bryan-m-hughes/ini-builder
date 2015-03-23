@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 module.exports.parse = function parse(rawData, options) {
   options = options || {};
-  options.commentDelimiter = ';';
+  options.commentDelimiter = options.commentDelimiter || ';';
   var lines = rawData.split('\n');
   var props = {};
   var entryRegex = /([^=]*)=(.*)/;
