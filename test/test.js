@@ -23,35 +23,43 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var confParser = require(__dirname + '/../index.js');
+var iniBuilder = require(__dirname + '/../index.js');
 
 module.exports = {
-  'basic-test': function (test) {
+  'basic': function (test) {
     var data = 'foo=bar';
-    var parsed = confParser.parse(data);
-    test.equal(parsed.getKeys().length, 1, 'has the proper number of keys');
-    test.ok(parsed.hasKey('foo'), 'has the proper key');
-    test.equal(parsed.get('foo'), 'bar', 'has the proper value');
+    var parsed = iniBuilder.parse(data);
+    test.equal(parsed.length, 1, 'has the proper number of entries');
+    test.ok(iniBuilder.hasPath(parsed, 'foo'), 'has the proper path');
+    test.equal(iniBuilder.find(parsed, 'foo').value, 'bar', 'has the proper value');
+    test.done();
+  },
+  'multi-segment-path': function(test) {
+    var data = 'foo=bar=baz';
+    var parsed = iniBuilder.parse(data);
+    test.equal(parsed.length, 1, 'has the proper number of entries');
+    test.ok(iniBuilder.hasPath(parsed, ['foo', 'bar']), 'has the proper path');
+    test.equal(iniBuilder.find(parsed, ['foo', 'bar']).value, 'baz', 'has the proper value');
     test.done();
   },
   'test-with-comments': function (test) {
     var data = '; This is a comment\n' +
       'foo=bar ; This is a different comment';
-    var parsed = confParser.parse(data);
-    test.equal(parsed.getKeys().length, 1, 'has the proper number of keys');
-    test.ok(parsed.hasKey('foo'), 'has the proper key');
-    test.equal(parsed.get('foo'), 'bar', 'has the proper value');
+    var parsed = iniBuilder.parse(data);
+    test.equal(parsed.length, 2, 'has the proper number of entries');
+    test.equal(parsed[0].comment, '; This is a comment', 'has the proper block comment');
+    test.ok(iniBuilder.hasPath(parsed, 'foo'), 'has the proper path');
+    test.equal(iniBuilder.find(parsed, 'foo').value, 'bar', 'has the proper value');
+    test.equal(iniBuilder.find(parsed, 'foo').comment, '; This is a different comment', 'has the proper inline comment');
     test.done();
   },
   'serialize-with-comments': function (test) {
     var data = '; This is a comment\n' +
       'foo=bar ; This is a different comment';
-    var parsed = confParser.parse(data);
-    parsed.set('foo', 'baz');
-    parsed.set('foo2', 'stuff');
-    test.equal(parsed.serialize(), '; This is a comment\n' +
-      'foo=baz ; This is a different comment\n' +
-      'foo2=stuff'
+    var parsed = iniBuilder.parse(data);
+    iniBuilder.find(parsed, 'foo').value = 'baz';
+    test.equal(iniBuilder.serialize(parsed), '; This is a comment\n' +
+      'foo=baz ; This is a different comment'
     );
     test.done();
   }

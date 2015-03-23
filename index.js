@@ -23,76 +23,92 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-module.exports.parse = function parse(rawData, options) {
+var entryRegex = /[^=]*=.*/;
+
+
+module.exports = {
+  parse: parse,
+  hasPath: hasPath,
+  find: find,
+  serialize: serialize
+};
+
+function parse(rawData, options) {
+
   options = options || {};
   options.commentDelimiter = options.commentDelimiter || ';';
+
+  var data = [];
+  var commentBlockStart = 0;
   var lines = rawData.split('\n');
-  var props = {};
-  var entryRegex = /([^=]*)=(.*)/;
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];
-    var lineComment;
-    var commentStart = line.indexOf(options.commentDelimiter);
-    if (commentStart !== -1) {
-      lineComment = line.substr(commentStart);
-      line = line.substr(0, commentStart);
+    var inlineCommentStart = line.indexOf(options.commentDelimiter);
+    var lineWithoutComments = line;
+    if (inlineCommentStart != -1) {
+      lineWithoutComments = line.substr(0, inlineCommentStart).trim();
     }
-    var match = entryRegex.exec(line);
-    if (match) {
-      props[match[1].trim()] = {
-        value: match[2].trim(),
-        line: i,
-        comment: lineComment
-      };
+    if (entryRegex.test(lineWithoutComments)) {
+      if (commentBlockStart != i) {
+        data.push({
+          comment: lines.slice(commentBlockStart, i).join('\n')
+        });
+      }
+      commentBlockStart = i + 1;
+      var entry = {};
+      if (inlineCommentStart != -1) {
+        entry.comment = line.substr(inlineCommentStart);
+      }
+      lineWithoutComments = lineWithoutComments.split('=');
+      entry.value = lineWithoutComments.pop();
+      entry.path = lineWithoutComments;
+      data.push(entry);
     }
   }
-  return new ConfData(lines, props);
-};
-
-function ConfData(lines, props) {
-  Object.defineProperties(this, {
-    _props: {
-      value: props
-    },
-    _lines: {
-      value: lines
-    },
-    _currentLength: {
-      value: lines.length,
-      writable: true
-    }
-  });
+  if (commentBlockStart != i) {
+    data.push({
+      comment: lines.slice(commentBlockStart, i).join('\n')
+    })
+  }
+  return data;
 }
 
-ConfData.prototype.hasKey = function hasKey(key) {
-  return this._props.hasOwnProperty(key);
-};
+function hasPath(data, path) {
+  return !!find(data, path);
+}
 
-ConfData.prototype.getKeys = function getKeys(key) {
-  return Object.keys(this._props);
-};
-
-ConfData.prototype.get = function get(key) {
-  return this._props[key].value;
-};
-
-ConfData.prototype.set = function set(key, value) {
-  if (!this._props[key]) {
-    this._props[key] = {
-      line: this._currentLength++
+function find(data, path) {
+  if (!Array.isArray(path)) {
+    path = [ path ];
+  }
+  for (var i = data.length - 1; i >= 0; i--) {
+    var entry = data[i];
+    if (entry.path && entry.path.length == path.length && entry.path.every(function (currentValue, index) {
+      return path[index] == currentValue;
+    })) {
+      return entry;
     }
   }
-  this._props[key].value = value;
-};
+}
 
-ConfData.prototype.serialize = function() {
-  var lines = this._lines;
-  for(var prop in this._props) {
-    var propValue = this._props[prop];
-    this._lines[propValue.line] = prop + '=' + propValue.value;
-    if (propValue.comment) {
-      this._lines[propValue.line] += ' ' + propValue.comment;
+function serialize(data, options) {
+  options = options || {};
+  options.commentDelimiter = options.commentDelimiter || ';';
+  var rawData = '';
+  for (var i = 0; i < data.length; i++) {
+    var entry = data[i];
+    if (entry.path) {
+      rawData += entry.path.join('=');
+      rawData += '=' + entry.value;
+      if (entry.comment) {
+        rawData += ' ' + entry.comment;
+      }
+    } else if (entry.comment) {
+      rawData += entry.comment;
+    }
+    if (i != data.length - 1) {
+      rawData += '\n';
     }
   }
-  return lines.join('\n');
-};
+  return rawData;
+}
