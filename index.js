@@ -35,6 +35,8 @@ module.exports = {
 
 function parse(rawData, options) {
 
+  rawData = rawData.toString();
+
   options = options || {};
   options.commentDelimiter = options.commentDelimiter || ';';
 
@@ -61,7 +63,9 @@ function parse(rawData, options) {
       }
       lineWithoutComments = lineWithoutComments.split('=');
       entry.value = lineWithoutComments.pop();
-      entry.path = lineWithoutComments;
+      entry.path = lineWithoutComments.map(function(segment) {
+        return segment.trim();
+      });
       data.push(entry);
     }
   }
