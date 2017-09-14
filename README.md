@@ -251,7 +251,7 @@ _Arguments_:
   </tr>
 </table>
 
-_Returns_: The entry if one was found, otherwise undefined.
+_Returns_: The entry if one was found, otherwise undefined. If more than one entry matches the given path, only the last entry is returned.
 
 ### findAll(data, path)
 
