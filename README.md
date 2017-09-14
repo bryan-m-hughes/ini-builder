@@ -18,7 +18,7 @@ INI builder takes in a string and parses it into an AST-like structure. This str
 The ```parse``` method returns an array, with each entry corresponding to a line, or group of lines, in the document. Each entry will be in one of two forms. The ```serialize``` method accepts this data format.
 
 The first form is a configuration entry, i.e. a key-value pair. This will always represent exactly one line in the document, and has the form:
- 
+
 ```JavaScript
 {
   value: [value],
@@ -26,7 +26,7 @@ The first form is a configuration entry, i.e. a key-value pair. This will always
   comment: [comment]
 }
 ```
- 
+
 The value is the value of the entry, and is always a string. The comment is any comment that appears _after_ the entry on the same line and is also a string. The path is one _or more_ keys for the entry. Some INI files support namespaced keys. As an example, let's say we're given the entry:
 
 ```ini
@@ -52,7 +52,7 @@ The second form of entry is a non-configuration entry, i.e. comments and whitesp
 ```
 
 These entries will always consume all content between configuration entires or the start/end of the document. For example, let's say we have the following document:
- 
+
 ```ini
 ; This is a document
 
@@ -148,7 +148,7 @@ fs.writeFileSync('modified-data.ini', iniBuilder.serialize(data));
 
 Parses the raw data into the data format described above.
 
-_Arguments_: 
+_Arguments_:
 
 <table>
   <thead>
@@ -197,7 +197,7 @@ _Note: INI builder does not currently support sections._
 
 Checks if the given path is found in the data
 
-_Arguments_: 
+_Arguments_:
 
 <table>
   <thead>
@@ -223,9 +223,9 @@ _Returns_: A boolean indicating whether or not the given path was found in the d
 
 ### find(data, path)
 
-Finds the entry at the given path and returns it, if it exists.
+Finds the most recent entry (i.e. occurs last in the file) at the given path and returns it, if it exists.
 
-_Arguments_: 
+_Arguments_:
 
 <table>
   <thead>
@@ -249,11 +249,39 @@ _Arguments_:
 
 _Returns_: The entry if one was found, otherwise undefined.
 
+### findAll(data, path)
+
+Finds all entries at the given path and returns them.
+
+_Arguments_:
+
+<table>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tr>
+    <td>data</td>
+    <td>Array</td>
+    <td>Data conforming to the parsed data spec</td>
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>String | Array</td>
+    <td>The path to search for</td>
+  </tr>
+</table>
+
+_Returns_: An array containing 0 or more entries.
+
 ## serialize(data, options)
 
 Serializes the data back to a string.
 
-_Arguments_: 
+_Arguments_:
 
 <table>
   <thead>
@@ -299,7 +327,7 @@ License
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Bryan Hughes bryan@theoreticalideations.com (https://theoreticalideations.com)
+Copyright (c) 2015-2017 Bryan Hughes <bryan@nebri.us>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
