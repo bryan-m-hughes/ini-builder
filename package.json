@@ -1,6 +1,6 @@
 {
   "name": "ini-builder",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Node.js module for reading and writing INI and *NIX config files",
   "main": "index.js",
   "scripts": {

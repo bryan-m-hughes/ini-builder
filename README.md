@@ -15,7 +15,7 @@ INI builder takes in a string and parses it into an AST-like structure. This str
 
 ## Data Format
 
-The ```parse``` method returns an array, with each entry corresponding to a line, or group of lines, in the document. Each entry will be in one of two forms. The ```serialize``` method accepts this data format.
+The `parse` method returns an array, with each entry corresponding to a line, or group of lines, in the document. Each entry will be in one of two forms. The `serialize` method accepts this data format.
 
 The first form is a configuration entry, i.e. a key-value pair. This will always represent exactly one line in the document, and has the form:
 
@@ -86,13 +86,17 @@ This will produce the following data:
 
 ## Editing or creating data
 
-Editing parsed data, or creating your own, is straight forward. The data returned from ```parse``` is just a regular JavaScript array, so you can modify it like you can any other JavaScript array.
+Editing parsed data, or creating your own, is straight forward. The data returned from `parse` is just a regular JavaScript array, so you can modify it like you can any other JavaScript array.
 
 ### Finding entries
 
-INI builder provides two helper methods for searching for data: ```hasPath``` and ```find```. Both of these methods take parsed data as their first argument, and the path in question for the second. The path can be a string representing a single segment path, or an array of strings.
+INI builder provides three helper methods for searching for data: `hasPath`, `find`, and `findAll`. All of these methods take parsed data as their first argument, and the path in question for the second. The path can be a string representing a single segment path, or an array of strings.
 
-```hasPath``` returns a boolean indicating whether or not an entry with the supplied path exists in the data, whereas ```find``` returns the entry, if it exists, otherwise it returns undefined.
+```JavaScript
+var hasEntry = iniBuilder.hasPath(data, 'foo');
+var entry = iniBuilder.find(data, 'foo');
+var entries = iniBuilder.findAll(data, 'foo');
+```
 
 ### Adding new entries
 
@@ -107,7 +111,7 @@ data.push({
 
 ### Editing existing entries
 
-To edit existing entries, you must first get a reference to that entry. You can iterate over the array yourself, or you can use the ```find``` method, e.g.:
+To edit existing entries, you must first get a reference to that entry. You can iterate over the array yourself, or you can use the `find` method, e.g.:
 
 ```JavaScript
 var entry = iniBuilder.find(data, 'foo');
@@ -125,7 +129,7 @@ data.splice(data.indexOf(entry), 1);
 
 ## Complete Example
 
-Here is a complete example that reads in some data from ```data.ini``` and writes it out to ```modified-data.ini```.
+Here is a complete example that reads in some data from `data.ini` and writes it out to `modified-data.ini`.
 
 ```JavaScript
 

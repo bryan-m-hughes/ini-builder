@@ -1,3 +1,7 @@
+## 1.1.1 (2017-9-14)
+
+- README updates that I want to show on npmjs.com. There are no code changes.
+
 ## 1.1.0 (2017-9-14)
 
 - Added `findAll` method
